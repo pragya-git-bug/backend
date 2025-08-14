@@ -1,45 +1,82 @@
-import React, { useState } from "react";
-import axios from "../api/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-export default function Signup() {
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "user" });
-  const [loading, setLoading] = useState(false);
+const Signup = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('user');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
-      await axios.post("/auth/signup", form);
-      alert("Registered successfully. Please log in.");
-      navigate("/login");
+      await axios.post('http://localhost:5000/api/auth/signup', { name, email, password, role });
+      navigate('/login');
     } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
-    } finally {
-      setLoading(false);
+      setError(err.response?.data?.message || 'Signup failed');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-2xl mb-4">Signup</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Name" className="w-full p-2 border rounded" required />
-        <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="Email" className="w-full p-2 border rounded" required />
-        <input name="password" value={form.password} onChange={handleChange} type="password" placeholder="Password" className="w-full p-2 border rounded" required />
-        {/* role selectable for dev/testing only */}
-        <select name="role" value={form.role} onChange={handleChange} className="w-full p-2 border rounded">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? "Signing..." : "Signup"}
-        </button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-500 to-red-500">
+      <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center text-red-600 mb-6">Create Account</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <select
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button
+            type="submit"
+            className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition duration-200"
+          >
+            Sign Up
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account?{' '}
+          <span
+            className="text-red-500 cursor-pointer hover:underline"
+            onClick={() => navigate('/login')}
+          >
+            Login
+          </span>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default Signup;

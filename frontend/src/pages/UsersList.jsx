@@ -23,7 +23,7 @@ export default function UsersList() {
 
   return (
     <div className="bg-white p-6 rounded shadow max-w-4xl mx-auto">
-      <h2 className="text-2xl mb-4">All Registered Users</h2>
+      <h2 className="text-2xl mb-4">All Registered Users...</h2>
       {loading ? (
         <div>Loading...</div>
       ) : (

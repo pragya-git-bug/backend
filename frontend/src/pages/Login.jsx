@@ -1,41 +1,68 @@
-import React, { useState } from "react";
-import axios from "../api/axiosInstance";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../store/authSlice";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/authSlice'; 
 
-export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setError('');
     try {
-      const res = await axios.post("/auth/login", form);
-      dispatch(loginSuccess({ token: res.data.token, role: res.data.role }));
-      navigate("/profile");
+      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const { token, role } = res.data;
+
+      dispatch(loginSuccess({ token, role }));
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+
+      // role k according dashboard navigation
+      if (role === 'admin') navigate('/admin/users');
+      else navigate('/profile');
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
-    } finally {
-      setLoading(false);
+      setError(err.response?.data?.message || 'Login failed');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-2xl mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="Email" className="w-full p-2 border rounded" required />
-        <input name="password" value={form.password} onChange={handleChange} type="password" placeholder="Password" className="w-full p-2 border rounded" required />
-        <button className="w-full bg-blue-600 text-white p-2 rounded" disabled={loading}>
-          {loading ? "Logging..." : "Login"}
-        </button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600">
+      <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">Welcome Back</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+          >
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;

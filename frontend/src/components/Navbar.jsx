@@ -16,7 +16,7 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow">
       <div className="container mx-auto p-4 flex justify-between items-center">
-        <Link to="/" className="font-bold text-xl">MERN Auth</Link>
+        <Link to="/" className="font-bold  text-indigo-700 mb-6">Role Based Task</Link>
         <div className="space-x-4">
           {!isAuthenticated ? (
             <>

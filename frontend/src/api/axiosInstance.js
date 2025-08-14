@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   baseURL,
 });
 
-// attach token automatically
+// aotomatic token attach karte hai
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
